@@ -137,7 +137,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     sed -i "s/port    = ssh/port    = $ssh_port/" /etc/fail2ban/jail.local
     sed -i "s/port     = ssh/port    = $ssh_port/" /etc/fail2ban/jail.local
     sed -i "s/backend = auto/backend = systemd/" /etc/fail2ban/jail.local
-    if systemctl is-active --quiet [service_name]; then
+    if systemctl is-active --quiet [nftables]; then
         echo "RUNNING"
         sed -i "s/banaction = iptables-multiport/banaction = nftables/" /etc/fail2ban/jail.local
         sed -i "s/banaction_allports = iptables-allports/banaction_allports = nftables[type=allports]/" /etc/fail2ban/jail.local
