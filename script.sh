@@ -156,6 +156,7 @@ prompt_yes_no "Install utility packages?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     apt install tree
     apt install locate
+    apt install unzip
     apt install btop
     apt install micro
     
