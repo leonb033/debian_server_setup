@@ -153,6 +153,8 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     cat /etc/fail2ban/jail.local | grep -A 25 "SSH servers" | grep "port"
     echo "Backend:"
     cat /etc/fail2ban/jail.local | grep -A 20 '"backend"' | grep "backend ="
+    echo "Banaction:"
+    cat /etc/fail2ban/jail.local | grep -A 6 "Default banning action" | grep "="
     
     prompt_continue
 fi
