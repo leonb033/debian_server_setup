@@ -107,7 +107,9 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl enable nftables
     systemctl start nftables
     nft flush ruleset
-    cp nftables.conf /etc/nftables.conf
+    wget https://raw.githubusercontent.com/leonb033/debian_server_setup/main/nftables.conf
+    sed -i "s/SSH_PORT/$ssh_port/" nftables.conf
+    mv -f nftables.conf /etc/nftables.conf
     systemctl restart nftables
     systemctl status nftables
     echo
