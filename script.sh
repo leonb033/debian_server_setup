@@ -141,7 +141,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
         echo "RUNNING"
         sed -i "s/banaction = iptables-multiport/banaction = nftables/" /etc/fail2ban/jail.local
         sed -i "s/banaction_allports = iptables-allports/banaction_allports = nftables[type=allports]/" /etc/fail2ban/jail.local
-    else:
+    else
         echo "NOT RUNNING"
     fi
     systemctl restart fail2ban
