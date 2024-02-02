@@ -87,9 +87,11 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     read -p "new ssh port: " ssh_port
     sed -i "s/#Port 22/Port $ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
-    systemctl status ssh
     
     print "RESULT:"
+    systemctl status ssh | grep "Loaded:"
+    systemctl status ssh | grep "Active:"
+    systemctl status ssh | grep "port"
     cat /etc/ssh/sshd_config | grep "Port "
     
     prompt_continue
@@ -115,9 +117,10 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     sed -i "s/SSH_PORT/$ssh_port/" nftables.conf
     mv -f nftables.conf /etc/nftables.conf
     systemctl restart nftables
-    systemctl status nftables
     
     print "RESULT:"
+    systemctl status nftables | grep "Loaded:"
+    systemctl status nftables | grep "Active:"
     nft list ruleset
     
     prompt_continue
@@ -146,15 +149,12 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
         sed -i "s/banaction_allports = iptables-allports/banaction_allports = nftables[type=allports]/" /etc/fail2ban/jail.local
     fi
     systemctl restart fail2ban
-    systemctl status fail2ban
-    
     
     print "RESULT:"
-    print "SSH ports:"
+    systemctl status fail2ban | grep "Loaded:"
+    systemctl status fail2ban | grep "Active:"
     cat /etc/fail2ban/jail.local | grep -A 25 "SSH servers" | grep "port"
-    print "Backend:"
     cat /etc/fail2ban/jail.local | grep -A 20 '"backend"' | grep "backend ="
-    print "Banaction:"
     cat /etc/fail2ban/jail.local | grep -A 6 "Default banning action" | grep "="
     
     prompt_continue
