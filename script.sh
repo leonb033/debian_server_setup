@@ -12,7 +12,6 @@ prompt_confirm() {
 }
 
 prompt_continue() {
-    echo
     prompt_confirm "Finished. Press enter to continue."
 }
 
