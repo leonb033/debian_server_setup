@@ -27,6 +27,10 @@ get_ssh_port() {
     echo $(grep "Port " /etc/ssh/sshd_config | awk '{print $2}')
 }
 
+replace_line() {
+    sed -i "/$1/c\\$2" $3
+}
+
 #
 # update system
 #
@@ -87,7 +91,8 @@ clear
 prompt_yes_no "Change ssh port?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     read -p "new ssh port: " new_ssh_port
-    sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
+    replace_line "Port " $new_ssh_port /etc/ssh/sshd_config
+    #sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
     
     print_message "RESULT:"
