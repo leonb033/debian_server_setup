@@ -23,10 +23,23 @@ prompt_yes_no() {
     done
 }
 
+# returns the current ssh port
 get_ssh_port() {
     echo $(grep "Port " /etc/ssh/sshd_config | awk '{print $2}')
 }
 
+# replaces a string inside a file
+# param 1: old string
+# param 2: new string
+# param 3: path to file
+replace_string() {
+    sed -i "s/$1/$2/" $3
+}
+
+# replaces a line inside a file
+# param 1: pattern to match old line
+# param 2: content of new line
+# param 3: path to file
 replace_line() {
     sed -i "/$1/c\\$2" $3
 }
@@ -75,7 +88,8 @@ clear
 #
 prompt_yes_no "Disable root ssh?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    sed -i "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
+    replace_line "PermitRootLogin " "PermitRootLogin no" /etc/ssh/sshd_config
+    #sed -i "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
     systemctl restart ssh
     
     print_message "RESULT:"
@@ -91,8 +105,7 @@ clear
 prompt_yes_no "Change ssh port?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     read -p "new ssh port: " new_ssh_port
-    sed -i "/Port /c\Port $new_ssh_port" "/etc/ssh/sshd_config"
-    #replace_line "Port " $new_ssh_port "/etc/ssh/sshd_config"
+    replace_line "Port " "Port $new_ssh_port" /etc/ssh/sshd_config
     #sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
     
@@ -118,8 +131,9 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl enable nftables
     systemctl start nftables
     nft flush ruleset
-    wget https://raw.githubusercontent.com/leonb033/debian_server_setup/main/nftables.conf
-    sed -i "s/SSH_PORT/$(get_ssh_port)/" nftables.conf
+    wget -O nftables.conf https://raw.githubusercontent.com/leonb033/debian_server_setup/main/nftables.conf
+    replace_string "SSH_PORT" $(get_ssh_port) nftables.conf
+    #sed -i "s/SSH_PORT/$(get_ssh_port)/" nftables.conf
     mv -f nftables.conf /etc/nftables.conf
     systemctl restart nftables
     
