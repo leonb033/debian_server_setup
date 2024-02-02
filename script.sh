@@ -2,8 +2,14 @@ clear
 
 ssh_port=-1
 
+print() {
+    echo
+    echo ">>> $1"
+    echo
+}
+
 prompt_confirm() {
-    echo $1
+    print $1
     read
 }
 
@@ -66,8 +72,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     sed -i "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
     systemctl restart ssh
     
-    echo
-    echo "RESULT:"
+    print "RESULT:"
     cat /etc/ssh/sshd_config | grep "PermitRootLogin"
     
     prompt_continue
@@ -84,8 +89,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl restart ssh
     systemctl status ssh
     
-    echo
-    echo "RESULT:"
+    print "RESULT:"
     cat /etc/ssh/sshd_config | grep "Port "
     
     prompt_continue
@@ -97,7 +101,7 @@ clear
 #
 prompt_yes_no "Setup nftables?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    echo "Setting up nftables..."
+    print "Setting up nftables..."
     if [[ $ssh_port -eq -1 ]]; then
         read -p "current ssh port: " ssh_port
     fi
@@ -112,8 +116,8 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     mv -f nftables.conf /etc/nftables.conf
     systemctl restart nftables
     systemctl status nftables
-    echo
-    echo "RESULT:"
+    
+    print "RESULT:"
     nft list ruleset
     
     prompt_continue
@@ -125,7 +129,7 @@ clear
 #
 prompt_yes_no "Setup fail2ban?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    echo "Setting up fail2ban..."
+    print "Setting up fail2ban..."
     if [[ $ssh_port -eq -1 ]]; then
         read -p "current ssh port: " ssh_port
     fi
@@ -144,13 +148,13 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl restart fail2ban
     systemctl status fail2ban
     
-    echo
-    echo "RESULT:"
-    echo "SSH ports:"
+    
+    print "RESULT:"
+    print "SSH ports:"
     cat /etc/fail2ban/jail.local | grep -A 25 "SSH servers" | grep "port"
-    echo "Backend:"
+    print "Backend:"
     cat /etc/fail2ban/jail.local | grep -A 20 '"backend"' | grep "backend ="
-    echo "Banaction:"
+    print "Banaction:"
     cat /etc/fail2ban/jail.local | grep -A 6 "Default banning action" | grep "="
     
     prompt_continue
