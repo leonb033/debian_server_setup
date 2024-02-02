@@ -1,13 +1,13 @@
 clear
 
-print() {
+print_message() {
     echo
     echo ">>> $1"
     echo
 }
 
 prompt_confirm() {
-    print "$1"
+    print_message "$1"
     read
 }
 
@@ -74,7 +74,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     sed -i "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
     systemctl restart ssh
     
-    print "RESULT:"
+    print_message "RESULT:"
     grep "PermitRootLogin" /etc/ssh/sshd_config
     
     prompt_continue
@@ -90,7 +90,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
     
-    print "RESULT:"
+    print_message "RESULT:"
     systemctl status ssh | grep "Loaded:"
     systemctl status ssh | grep "Active:"
     systemctl status ssh | grep "port"
@@ -105,7 +105,7 @@ clear
 #
 prompt_yes_no "Setup nftables?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    print "Setting up nftables..."
+    print_message "Setting up nftables..."
     apt purge iptables
     apt autoremove --purge
     apt install nftables
@@ -117,7 +117,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     mv -f nftables.conf /etc/nftables.conf
     systemctl restart nftables
     
-    print "RESULT:"
+    print_message "RESULT:"
     systemctl status nftables | grep "Loaded:"
     systemctl status nftables | grep "Active:"
     nft list ruleset
@@ -131,7 +131,7 @@ clear
 #
 prompt_yes_no "Setup fail2ban?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    print "Setting up fail2ban..."
+    print_message "Setting up fail2ban..."
     apt install fail2ban
     systemctl enable fail2ban
     systemctl start fail2ban
@@ -146,7 +146,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     fi
     systemctl restart fail2ban
     
-    print "RESULT:"
+    print_message "RESULT:"
     systemctl status fail2ban | grep "Loaded:"
     systemctl status fail2ban | grep "Active:"
     grep -A 25 "SSH servers" /etc/fail2ban/jail.local | grep "port"
