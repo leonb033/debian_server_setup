@@ -91,7 +91,7 @@ clear
 prompt_yes_no "Change ssh port?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     read -p "new ssh port: " new_ssh_port
-    sed -i "/Port /c\\$new_ssh_port" "/etc/ssh/sshd_config"
+    sed -i "/Port /c\Port $new_ssh_port" "/etc/ssh/sshd_config"
     #replace_line "Port " $new_ssh_port "/etc/ssh/sshd_config"
     #sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
