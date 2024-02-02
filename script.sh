@@ -1,7 +1,5 @@
 clear
 
-ssh_port=-1
-
 print() {
     echo
     echo ">>> $1"
@@ -23,6 +21,10 @@ prompt_yes_no() {
         read -p "$1 (y/n): "
         if [[ $REPLY =~ ^[yY]$ || $REPLY =~ ^[nN]$ ]]; then break; fi
     done
+}
+
+get_ssh_port() {
+    echo $(grep "Port " /etc/ssh/sshd_config | awk '{print $2}')
 }
 
 #
@@ -84,8 +86,8 @@ clear
 #
 prompt_yes_no "Change ssh port?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    read -p "new ssh port: " ssh_port
-    sed -i "s/#Port 22/Port $ssh_port/" /etc/ssh/sshd_config
+    read -p "new ssh port: " new_ssh_port
+    sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
     
     print "RESULT:"
@@ -104,9 +106,6 @@ clear
 prompt_yes_no "Setup nftables?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     print "Setting up nftables..."
-    if [[ $ssh_port -eq -1 ]]; then
-        read -p "current ssh port: " ssh_port
-    fi
     apt purge iptables
     apt autoremove --purge
     apt install nftables
@@ -114,7 +113,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl start nftables
     nft flush ruleset
     wget https://raw.githubusercontent.com/leonb033/debian_server_setup/main/nftables.conf
-    sed -i "s/SSH_PORT/$ssh_port/" nftables.conf
+    sed -i "s/SSH_PORT/$(get_ssh_port)/" nftables.conf
     mv -f nftables.conf /etc/nftables.conf
     systemctl restart nftables
     
@@ -133,16 +132,13 @@ clear
 prompt_yes_no "Setup fail2ban?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     print "Setting up fail2ban..."
-    if [[ $ssh_port -eq -1 ]]; then
-        read -p "current ssh port: " ssh_port
-    fi
     apt install fail2ban
     systemctl enable fail2ban
     systemctl start fail2ban
     cp /etc/fail2ban/fail2ban.conf /etc/fail2ban/fail2ban.local
     cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-    sed -i "s/port    = ssh/port    = $ssh_port/" /etc/fail2ban/jail.local
-    sed -i "s/port     = ssh/port    = $ssh_port/" /etc/fail2ban/jail.local
+    sed -i "s/port    = ssh/port    = $(get_ssh_port)/" /etc/fail2ban/jail.local
+    sed -i "s/port     = ssh/port    = $(get_ssh_port)/" /etc/fail2ban/jail.local
     sed -i "s/backend = auto/backend = systemd/" /etc/fail2ban/jail.local
     if systemctl is-active --quiet [nftables]; then
         sed -i "s/banaction = iptables-multiport/banaction = nftables/" /etc/fail2ban/jail.local
