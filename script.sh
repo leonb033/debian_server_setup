@@ -7,7 +7,7 @@ print() {
 }
 
 prompt_confirm() {
-    print $1
+    print "$1"
     read
 }
 
