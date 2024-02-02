@@ -75,7 +75,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl restart ssh
     
     print "RESULT:"
-    cat /etc/ssh/sshd_config | grep "PermitRootLogin"
+    grep "PermitRootLogin" /etc/ssh/sshd_config
     
     prompt_continue
 fi
@@ -94,7 +94,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl status ssh | grep "Loaded:"
     systemctl status ssh | grep "Active:"
     systemctl status ssh | grep "port"
-    cat /etc/ssh/sshd_config | grep "Port "
+    grep "Port " /etc/ssh/sshd_config
     
     prompt_continue
 fi
@@ -149,9 +149,9 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     print "RESULT:"
     systemctl status fail2ban | grep "Loaded:"
     systemctl status fail2ban | grep "Active:"
-    cat /etc/fail2ban/jail.local | grep -A 25 "SSH servers" | grep "port"
-    cat /etc/fail2ban/jail.local | grep -A 20 '"backend"' | grep "backend ="
-    cat /etc/fail2ban/jail.local | grep -A 6 "Default banning action" | grep "="
+    grep -A 25 "SSH servers" /etc/fail2ban/jail.local | grep "port"
+    grep -A 20 '"backend"' /etc/fail2ban/jail.local | grep "backend ="
+    grep -A 6 "Default banning action" /etc/fail2ban/jail.local | grep "="
     
     prompt_continue
 fi
