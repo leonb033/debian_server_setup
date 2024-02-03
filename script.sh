@@ -154,11 +154,10 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     apt install fail2ban
     systemctl enable fail2ban
     systemctl start fail2ban
-    cp /etc/fail2ban/fail2ban.conf /etc/fail2ban/fail2ban.local
-    cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-    sed -i "s/port    = ssh/port    = $(get_ssh_port)/" /etc/fail2ban/jail.local
-    sed -i "s/port     = ssh/port    = $(get_ssh_port)/" /etc/fail2ban/jail.local
-    sed -i "s/backend = auto/backend = systemd/" /etc/fail2ban/jail.local
+    touch /etc/fail2ban/fail2ban.local
+    wget -O jail.local https://raw.githubusercontent.com/leonb033/debian_server_setup/main/jail.local
+    replace_line "port    = " "port    = $(get_ssh_port)" jail.local
+    mv -f jail.local /etc/fail2ban/jail.local
     if systemctl is-active --quiet [nftables]; then
         sed -i "s/banaction = iptables-multiport/banaction = nftables/" /etc/fail2ban/jail.local
         sed -i "s/banaction_allports = iptables-allports/banaction_allports = nftables[type=allports]/" /etc/fail2ban/jail.local
