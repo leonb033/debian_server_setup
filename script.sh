@@ -1,8 +1,10 @@
 clear
 
+prefix = ">>>"
+
 print_message() {
     echo
-    echo ">>> $1"
+    echo "$prefix $1"
     echo
 }
 
@@ -17,7 +19,7 @@ prompt_continue() {
 
 prompt_yes_no() {
     while true; do
-        read -p "$1 (y/n): "
+        read -p "$prefix $1 (y/n): "
         if [[ $REPLY =~ ^[yY]$ || $REPLY =~ ^[nN]$ ]]; then break; fi
     done
 }
