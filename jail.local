@@ -1,3 +1,5 @@
+[DEFAULT]
+
 # "bantime" is the number of seconds that a host is banned.
 bantime  = 10m
 
