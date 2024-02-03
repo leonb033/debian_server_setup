@@ -1,6 +1,6 @@
 clear
 
-$prefix = ">>>"
+prefix = ">>>"
 
 print_message() {
     echo
