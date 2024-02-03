@@ -157,18 +157,17 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     touch /etc/fail2ban/fail2ban.local
     wget -O jail.local https://raw.githubusercontent.com/leonb033/debian_server_setup/main/jail.local
     replace_line "port    = " "port    = $(get_ssh_port)" jail.local
-    mv -f jail.local /etc/fail2ban/jail.local
-    if systemctl is-active --quiet [nftables]; then
-        sed -i "s/banaction = iptables-multiport/banaction = nftables/" /etc/fail2ban/jail.local
-        sed -i "s/banaction_allports = iptables-allports/banaction_allports = nftables[type=allports]/" /etc/fail2ban/jail.local
+    if systemctl is-active --quiet nftables; then
+        replace_line "banaction = " "banaction = nftables" jail.local
+        replace_line "banaction_allports = " "banaction_allports = nftables[type=allports]" jail.local
     fi
+    mv -f jail.local /etc/fail2ban/jail.local
     systemctl restart fail2ban
     
     print_message "RESULT:"
     systemctl status fail2ban | grep "Loaded:"
     systemctl status fail2ban | grep "Active:"
     grep -A 25 "SSH servers" /etc/fail2ban/jail.local | grep "port"
-    grep -A 20 '"backend"' /etc/fail2ban/jail.local | grep "backend ="
     grep -A 6 "Default banning action" /etc/fail2ban/jail.local | grep "="
     
     prompt_continue
