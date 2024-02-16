@@ -181,6 +181,7 @@ clear
 #
 prompt_yes_no "Install utility packages?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
+    apt install net-tools
     apt install tree
     apt install locate
     apt install unzip
