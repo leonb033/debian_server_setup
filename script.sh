@@ -87,10 +87,9 @@ clear
 #
 # disable root ssh
 #
-prompt_yes_no "Disable root ssh?"
+prompt_yes_no "Disable root ssh login?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     replace_line "PermitRootLogin " "PermitRootLogin no" /etc/ssh/sshd_config
-    #sed -i "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
     systemctl restart ssh
     
     print_message "RESULT:"
@@ -107,7 +106,6 @@ prompt_yes_no "Change ssh port?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     read -p "new ssh port: " new_ssh_port
     replace_line "Port " "Port $new_ssh_port" /etc/ssh/sshd_config
-    #sed -i "s/#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
     systemctl restart ssh
     
     print_message "RESULT:"
@@ -121,27 +119,19 @@ fi
 clear
 
 #
-# nftables
+# ufw
 #
-prompt_yes_no "Setup nftables?"
+prompt_yes_no "Setup ufw?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    print_message "Setting up nftables..."
-    apt purge iptables
-    apt autoremove --purge
-    apt install nftables
-    systemctl enable nftables
-    systemctl start nftables
-    nft flush ruleset
-    wget -O nftables.conf https://raw.githubusercontent.com/leonb033/debian_server_setup/main/nftables.conf
-    replace_string "SSH_PORT" $(get_ssh_port) nftables.conf
-    #sed -i "s/SSH_PORT/$(get_ssh_port)/" nftables.conf
-    mv -f nftables.conf /etc/nftables.conf
-    systemctl restart nftables
-    
+    print_message "Setting up ufw..."
+    apt install ufw
+    ufw default allow outgoing
+    ufw default deny incoming
+    ufw allow $(get_ssh_port)/tcp
+    ufw enable
+
     print_message "RESULT:"
-    systemctl status nftables | grep "Loaded:"
-    systemctl status nftables | grep "Active:"
-    nft list ruleset
+    ufw status
     
     prompt_continue
 fi
@@ -154,16 +144,11 @@ prompt_yes_no "Setup fail2ban?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     print_message "Setting up fail2ban..."
     apt install fail2ban
-    systemctl enable fail2ban
-    systemctl start fail2ban
     touch /etc/fail2ban/fail2ban.local
     wget -O jail.local https://raw.githubusercontent.com/leonb033/debian_server_setup/main/jail.local
     replace_line "port    = " "port    = $(get_ssh_port)" jail.local
-    if systemctl is-active --quiet nftables; then
-        replace_line "banaction = " "banaction = nftables" jail.local
-        replace_line "banaction_allports = " "banaction_allports = nftables[type=allports]" jail.local
-    fi
     mv -f jail.local /etc/fail2ban/jail.local
+    systemctl enable fail2ban
     systemctl restart fail2ban
     
     print_message "RESULT:"
@@ -181,10 +166,10 @@ clear
 #
 prompt_yes_no "Install utility packages?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
-    apt install net-tools
     apt install tree
     apt install locate
     apt install unzip
+    apt install net-tools
     apt install btop
     apt install micro
     
