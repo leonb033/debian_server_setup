@@ -45,6 +45,11 @@ replace_line() {
     sed -i "/$1/c\\$2" $3
 }
 
+# creates a cronjob
+create_cronjob() {
+    crontab -l | { cat; echo "$1"; } | crontab -
+}
+
 #
 # update system
 #
@@ -121,9 +126,10 @@ clear
 #
 # ufw
 #
-prompt_yes_no "Setup ufw?"
+prompt_yes_no "Set up ufw?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     print_message "Setting up ufw..."
+    
     apt install ufw
     ufw default allow outgoing
     ufw default deny incoming
@@ -140,9 +146,10 @@ clear
 #
 # fail2ban
 #
-prompt_yes_no "Setup fail2ban?"
+prompt_yes_no "Set up fail2ban?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     print_message "Setting up fail2ban..."
+    
     apt install fail2ban
     touch /etc/fail2ban/fail2ban.local
     wget -O jail.local https://raw.githubusercontent.com/leonb033/debian_server_setup/main/jail.local
@@ -156,6 +163,24 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     systemctl status fail2ban | grep "Active:"
     grep -A 25 "SSH servers" /etc/fail2ban/jail.local | grep "port"
     grep -A 6 "Default banning action" /etc/fail2ban/jail.local | grep "="
+    
+    prompt_continue
+fi
+clear
+
+#
+# daily updates
+#
+if [[ $REPLY =~ ^[yY]$ ]]; then
+    print_message "Setting up daily updates..."
+
+    read -p "update time (hour): " update_hour
+    read -p "update time (minute): " update_minute
+
+    mv ./update.sh ~/update.sh
+    touch ~/update.log
+    chmod 700 ~/update.sh ~/update.log
+    create_cronjob "$update_minute $update_hour * * * bash ~/update.sh >> ~/update.log"
     
     prompt_continue
 fi
