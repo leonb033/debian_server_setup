@@ -171,6 +171,7 @@ clear
 #
 # daily updates
 #
+prompt_yes_no "Set up daily updates?"
 if [[ $REPLY =~ ^[yY]$ ]]; then
     print_message "Setting up daily updates..."
 
