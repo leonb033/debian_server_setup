@@ -152,7 +152,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     
     apt install fail2ban
     touch /etc/fail2ban/fail2ban.local
-    wget -O jail.local https://raw.githubusercontent.com/leonb033/debian_server_setup/main/jail.local
+    #wget -O jail.local https://raw.githubusercontent.com/leonb033/debian_server_setup/main/jail.local
     replace_line "port    = " "port    = $(get_ssh_port)" jail.local
     mv -f jail.local /etc/fail2ban/jail.local
     systemctl enable fail2ban
