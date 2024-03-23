@@ -169,6 +169,29 @@ fi
 clear
 
 #
+# ClamAV
+#
+prompt_yes_no "Set up ClamAV?"
+if [[ $REPLY =~ ^[yY]$ ]]; then
+    print_message "Setting up ClamAV..."
+    apt install clamav clamav-daemon
+    systemctl start clamav-freshclam
+    systemctl enable clamav-freshclam
+
+    prompt_yes_no "Set up daily virus scans?"
+    if [[ $REPLY =~ ^[yY]$ ]]; then
+
+        read -p "scan time (hour): " scan_hour
+        read -p "scan time (minute): " scan_minute
+
+        create_cronjob "$scan_minute $scan_hour * * * clamdscan -r / >> ~/clamav.log"
+    fi
+    
+    prompt_continue
+fi
+clear
+
+#
 # daily updates
 #
 prompt_yes_no "Set up daily updates?"
