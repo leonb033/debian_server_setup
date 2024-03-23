@@ -177,14 +177,17 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     apt install clamav clamav-daemon
     systemctl start clamav-freshclam
     systemctl enable clamav-freshclam
+    
+    prompt_continue
+    clear
 
     prompt_yes_no "Set up daily virus scans?"
     if [[ $REPLY =~ ^[yY]$ ]]; then
-
+        clear
         read -p "scan time (hour): " scan_hour
         read -p "scan time (minute): " scan_minute
-
-        create_cronjob "$scan_minute $scan_hour * * * clamdscan -r / >> ~/clamav.log"
+        create_cronjob "$scan_minute $scan_hour * * * clamscan / --recursive --stdout > clamav.log"
+        prompt_continue
     fi
     
     prompt_continue
@@ -204,7 +207,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     mv ./update.sh ~/update.sh
     touch ~/update.log
     chmod 700 ~/update.sh ~/update.log
-    create_cronjob "$update_minute $update_hour * * * bash ~/update.sh >> ~/update.log"
+    create_cronjob "$update_minute $update_hour * * * bash ~/update.sh > ~/update.log"
     
     prompt_continue
 fi
