@@ -198,6 +198,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     apt install net-tools
     apt install btop
     apt install micro
+    apt install nmap
     
     prompt_continue
 fi
