@@ -104,8 +104,6 @@ PrivateKey = <SERVER_PRIVATE_KEY>
 AllowedIPs = 10.10.10.2, 10.89.0.0/24
 PublicKey = <CLIENT_PUBLIC_KEY>
 ```
-PostUp = ip route add 10.89.0.0/24 via 10.10.10.1
-PreDown = ip route del 10.89.0.0/24 via 10.10.10.1
 
 > **Enable auto-start for interface**\
 `sudo systemctl enable wg-quick@wg0.service`\
