@@ -1,4 +1,4 @@
-# WG-Podman-Server
+# Podman over Wireguard (Manual Setup)
 ## Podman
 > **Enable backports**\
 Open sources file and append backports.\
