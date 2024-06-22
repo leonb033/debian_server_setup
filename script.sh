@@ -198,6 +198,7 @@ if [[ $REPLY =~ ^[yY]$ ]]; then
     apt install net-tools
     apt install btop
     apt install w3m
+    apt install tmux
     apt install micro
     apt install nmap
     
