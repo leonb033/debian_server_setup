@@ -99,6 +99,9 @@ Apply changes.\
 Address = 10.10.10.1
 ListenPort = 51820
 PrivateKey = <SERVER_PRIVATE_KEY>
+Table = off
+PostUp = ip route add 10.10.10.0/24 via 10.10.10.1
+PreDown = ip route del 10.10.10.0/24 via 10.10.10.1
 
 [Peer]
 AllowedIPs = 10.10.10.2, 10.89.0.0/24
